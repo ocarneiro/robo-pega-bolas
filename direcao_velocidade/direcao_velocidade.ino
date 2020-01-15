@@ -111,8 +111,6 @@ void loop() {
   int velocidade_motor_esquerdo = 0;
   int velocidade_motor_direito = 0;
 
-  boolean reverso_ativo = deRadioParaBinario(PWM_IN_REVERSO);
-
   int aceleracao = deRadioParaMotor(PWM_IN_ACELERADOR);
 
   int direcao = deRadioParaDirecao(PWM_IN_DIRECAO);
@@ -124,15 +122,23 @@ void loop() {
     velocidade_motor_direito = aceleracao;
   }
 
-  // TODO: tratamento da ré (reverso)
-  // se a chave estiver ligada:  gnd, sinal, gnd, sinal
-  // se desligada: sinal, gnd, sinal, gnd
-  // if reverso_ativo...
-  
-  analogWrite(PWM_OUT_MOTOR_A_PINO1, velocidade_motor_esquerdo);
-  digitalWrite(PWM_OUT_MOTOR_A_PINO2, LOW);
-  analogWrite(PWM_OUT_MOTOR_B_PINO3, velocidade_motor_direito);
-  digitalWrite(PWM_OUT_MOTOR_B_PINO4, LOW);
+  boolean reverso_ativo = deRadioParaBinario(PWM_IN_REVERSO);
+
+  // Tratamento da ré (reverso)
+  // - envia para o L298N sinal ou gnd conforme o caso.
+  // se a chave estiver ligada (ré):  gnd, sinal, gnd, sinal
+  // se desligada (frente): sinal, gnd, sinal, gnd
+  if (reverso_ativo) {
+      digitalWrite(PWM_OUT_MOTOR_A_PINO1, LOW);
+      analogWrite(PWM_OUT_MOTOR_A_PINO2, velocidade_motor_esquerdo);
+      digitalWrite(PWM_OUT_MOTOR_B_PINO3, LOW);
+      analogWrite(PWM_OUT_MOTOR_B_PINO4, velocidade_motor_direito);      
+  } else {
+      analogWrite(PWM_OUT_MOTOR_A_PINO1, velocidade_motor_esquerdo);
+      digitalWrite(PWM_OUT_MOTOR_A_PINO2, LOW);
+      analogWrite(PWM_OUT_MOTOR_B_PINO3, velocidade_motor_direito);
+      digitalWrite(PWM_OUT_MOTOR_B_PINO4, LOW);
+  }
   if(MODO_DEBUG) {
     debug(reverso_ativo, 0, 1);
   }
