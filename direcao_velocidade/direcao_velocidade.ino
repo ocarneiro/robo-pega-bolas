@@ -120,6 +120,9 @@ void loop() {
   if (direcaoNeutra(direcao)) {
     velocidade_motor_esquerdo = aceleracao;
     velocidade_motor_direito = aceleracao;
+  } else {
+    velocidade_motor_esquerdo = aceleracao + direcao/3;
+    velocidade_motor_direito = aceleracao - direcao/3;
   }
 
   boolean reverso_ativo = deRadioParaBinario(PWM_IN_REVERSO);
